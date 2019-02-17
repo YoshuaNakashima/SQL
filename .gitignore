@@ -1,0 +1,9 @@
+﻿################################################################################
+# この .gitignore ファイルは Microsoft(R) Visual Studio によって自動的に作成されました。
+################################################################################
+
+/.vs
+/ConsoleApp1/.vs/ConsoleApp1/v15
+/ConsoleApp1/ConsoleApp1/bin/Debug
+/ConsoleApp1/ConsoleApp1/obj/Debug
+/ConsoleApp1/packages
