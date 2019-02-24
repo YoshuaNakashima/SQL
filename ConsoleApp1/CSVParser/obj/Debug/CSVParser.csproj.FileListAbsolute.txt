@@ -6,3 +6,4 @@ C:\Users\yoshu\source\repos\T-SQL\ConsoleApp1\CSVParser\obj\Debug\CSVParser.exe
 C:\Users\yoshu\source\repos\T-SQL\ConsoleApp1\CSVParser\obj\Debug\CSVParser.pdb
 C:\Users\yoshu\source\repos\T-SQL\ConsoleApp1\CSVParser\bin\Debug\Resources\FireProtection.csv
 C:\Users\yoshu\source\repos\T-SQL\ConsoleApp1\CSVParser\bin\Debug\Resources\test.csv
+C:\Users\yoshu\source\repos\T-SQL\ConsoleApp1\CSVParser\obj\Debug\CSVParser.csprojAssemblyReference.cache

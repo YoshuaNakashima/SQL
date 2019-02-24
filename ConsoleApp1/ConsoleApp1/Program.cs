@@ -14,61 +14,72 @@ namespace ConsoleApp1
 
         static void Main(string[] args)
         {
-            db.Database.Log = log => System.Diagnostics.Debug.WriteLine(log);
+            Class1.GetValueFromHierarchy();
 
-            long[] ids = new long[] { 3, 8, 159, 160, 161 };
-
-            var result = GetSpecCategory(ids).Select(c => new { Id = c.id, Name = c.name, Depth = c.nth_child });
+            var result = Program.GetModelHierarchy(2);
 
             string json = JsonConvert.SerializeObject(result);
 
-            Console.WriteLine(json);
-            Console.ReadKey();
+            System.Diagnostics.Trace.WriteLine(json);
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="ancestorIds"></param>
+        /// <param name="rootNode"></param>
         /// <returns></returns>
-        public static IEnumerable<category> GetSpecCategory(long[] ancestorIds)
+        public static Model[] GetModelHierarchy(long rootNode)
         {
-            var query = db.categories
+            var newList = db.tree_paths
+                .Where(t => t.ancestor == rootNode && t.path_length == 1)
                 .Join(
-                    GetEdge(ancestorIds).AsEnumerable(),
-                    c => c.id,
-                    i => i.descendant,
-                    (category, tree_path) => category
+                    db.categories,
+                    o => o.descendant,
+                    i => i.id,
+                    (outer, inner) => new {
+                        outer.ancestor,
+                        outer.descendant,
+                        outer.path_length,
+                        inner.id,
+                        inner.name,
+                    }
                 ).ToList();
-            return query;
-        }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="ancestorIds"></param>
-        /// <returns></returns>
-        public static IQueryable<tree_paths> GetEdge(long[] ancestorIds)
-        {
-            IQueryable<tree_paths> query = db.tree_paths;
-            foreach (long ancestorId in ancestorIds)
+            List<Model> models = null;
+            if (newList.Count > 0)
             {
-                query = GetPath(query, ancestorId); 
+                models = new List<Model>();
+                foreach (var item in newList)
+                {
+                    models.Add(new Model() {
+                        Id = item.id,
+                        Name = item.name,
+                        Models = GetModelHierarchy(item.id)
+                    });
+                }
             }
-            return query;
+
+            return models?.ToArray();
         }
 
         /// <summary>
-        /// 
+        /// １階層下のリストのみ取得
         /// </summary>
-        public static IQueryable<tree_paths> GetPath(IQueryable<tree_paths> paths, long ancestorId)
+        private IEnumerable<tree_paths> GetPath(IEnumerable<tree_paths> paths, long ancestorId)
         {
             return paths.Join(
-                db.tree_paths.Where(p => p.ancestor == ancestorId),
+                db.tree_paths.Where(p => p.ancestor == ancestorId && p.path_length == 1),
                 o => o.ancestor,
                 i => i.descendant,
                 (outer, inner) => outer
             );
         }
+    }
+
+    public class Model
+    {
+        public long Id { get; set; }
+        public string Name { get; set; }
+        public IEnumerable<Model> Models { get; set; }
     }
 }
